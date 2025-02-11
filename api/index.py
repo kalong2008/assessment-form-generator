@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from generateAssessment import AssessmentGenerator
+from api.generateAssessment import AssessmentGenerator
 import json
 
 app = Flask(__name__, static_url_path='', static_folder='static', template_folder='templates')
