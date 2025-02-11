@@ -1,6 +1,17 @@
 from flask import Flask, render_template, request, jsonify
-from generateAssessment import AssessmentGenerator
 import json
+import os
+import sys
+
+# Add the project root directory to Python path for local development
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+sys.path.append(project_root)
+
+try:
+    from api.generateAssessment import AssessmentGenerator  # For Vercel
+except ImportError:
+    from generateAssessment import AssessmentGenerator  # For local development
 
 app = Flask(__name__, static_url_path='', static_folder='static', template_folder='templates')
 
