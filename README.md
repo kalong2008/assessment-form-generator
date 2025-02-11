@@ -25,7 +25,7 @@ A Flask-based web application that generates customizable assessment forms with 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/assessment-form-generator.git
+   git clone https://github.com/kalong2008/assessment-form-generator.git
    ```
 
 2. Install dependencies:
