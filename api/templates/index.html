@@ -1,75 +1,330 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment Form Generator</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .header p {
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .choices-container, .questions-container {
+            margin-top: 1rem;
+        }
+
+        .choice-item, .question-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-reset {
+            background-color: #94a3b8;  /* Slate gray color */
+            color: white;
+            margin-left: 1rem;
+        }
+
+        .btn-reset:hover {
+            background-color: #64748b;  /* Darker slate gray on hover */
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .output-container {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .output-section {
+            margin-bottom: 2rem;
+        }
+
+        .output-section h3 {
+            margin-bottom: 1rem;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn i {
+            font-size: 1.1rem;
+        }
+
+        .success-message {
+            color: var(--success);
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .tab-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .tab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .output {
+            background-color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Assessment Form Generator</h1>
-        
-        <div class="input-section">
-            <h2>Configure Your Assessment Form</h2>
-            <div class="config-form">
+        <header class="header">
+            <h1>Assessment Form Generator</h1>
+            <p>Create custom assessment forms with ease</p>
+        </header>
+
+        <div class="card">
+            <form id="generatorForm">
                 <div class="form-group">
-                    <label for="name">Assessment Name:</label>
-                    <input type="text" id="name" placeholder="e.g., love_language">
+                    <label for="name">Assessment Name</label>
+                    <input type="text" id="name" class="form-control" required placeholder="e.g., personality_test">
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="title">Assessment Title:</label>
-                    <input type="text" id="title" placeholder="e.g., 愛的語言測試">
+                    <label for="title">Assessment Title</label>
+                    <input type="text" id="title" class="form-control" required placeholder="e.g., Personality Assessment">
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="form_action_url">Form Action URL:</label>
-                    <input type="text" id="form_action_url" placeholder="e.g., https://example.com/submit">
+                    <label for="formAction">Form Action URL</label>
+                    <input type="url" id="formAction" class="form-control" required placeholder="https://api.example.com/submit">
                 </div>
-                
+
                 <div class="form-group">
-                    <label>Choices:</label>
-                    <div id="choicesContainer">
-                        <div class="choice-item">
-                            <input type="text" placeholder="Choice text" class="choice-text">
-                            <input type="number" placeholder="Value" class="choice-value">
-                            <button type="button" onclick="removeChoice(this)">Remove</button>
-                        </div>
-                    </div>
-                    <button type="button" onclick="addChoice()">Add Choice</button>
+                    <label>Answer Choices</label>
+                    <div id="choicesContainer" class="choices-container"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addChoice()">
+                        <i class="fas fa-plus"></i> Add Choice
+                    </button>
                 </div>
-                
+
                 <div class="form-group">
-                    <label>Questions:</label>
-                    <div id="questionsContainer">
-                        <div class="question-item">
-                            <input type="text" placeholder="Enter question" class="question-text">
-                            <button type="button" onclick="removeQuestion(this)">Remove</button>
-                        </div>
-                    </div>
-                    <button type="button" onclick="addQuestion()">Add Question</button>
+                    <label>Questions</label>
+                    <div id="questionsContainer" class="questions-container"></div>
+                    <button type="button" class="btn btn-secondary" onclick="addQuestion()">
+                        <i class="fas fa-plus"></i> Add Question
+                    </button>
                 </div>
-            </div>
-            <button onclick="generateAssessment()">Generate</button>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-magic"></i> Generate Form
+                    </button>
+                    <button type="button" class="btn btn-reset" onclick="resetForm()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </form>
         </div>
 
-        <div class="output-section">
-            <div class="header-section">
-                <div class="tab-buttons">
-                    <button onclick="showTab('html')">HTML</button>
-                    <button onclick="showTab('js')">JavaScript</button>
+        <div id="outputContainer" class="output-container">
+            <div class="card">
+                <div class="tab-header">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab('html')">HTML</button>
+                        <button class="tab-btn" onclick="switchTab('js')">JavaScript</button>
+                    </div>
+                    <div class="tab-actions">
+                        <button id="htmlCopyBtn" class="btn btn-primary copy-btn" onclick="copyToClipboard('htmlOutput')">
+                            <i class="fas fa-copy"></i> Copy HTML
+                        </button>
+                        <button id="jsCopyBtn" class="btn btn-primary copy-btn" onclick="copyToClipboard('jsOutput')" style="display: none;">
+                            <i class="fas fa-copy"></i> Copy JavaScript
+                        </button>
+                    </div>
                 </div>
-                <div class="copy-buttons">
-                    <button onclick="copyToClipboard('htmlCode')" id="copyHtmlBtn" style="display: inline-block">Copy HTML</button>
-                    <button onclick="copyToClipboard('jsCode')" id="copyJsBtn" style="display: none">Copy JavaScript</button>
+
+                <div id="htmlSection" class="tab-content active">
+                    <pre id="htmlOutput" class="output"></pre>
+                    <div class="success-message">Copied to clipboard!</div>
                 </div>
-            </div>
 
-            <div id="htmlOutput" class="tab-content">
-                <pre><code id="htmlCode"></code></pre>
-            </div>
-
-            <div id="jsOutput" class="tab-content" style="display:none;">
-                <pre><code id="jsCode"></code></pre>
+                <div id="jsSection" class="tab-content">
+                    <pre id="jsOutput" class="output"></pre>
+                    <div class="success-message">Copied to clipboard!</div>
+                </div>
             </div>
         </div>
     </div>
@@ -77,77 +332,112 @@
     <script>
         function addChoice() {
             const container = document.getElementById('choicesContainer');
-            const newChoice = document.createElement('div');
-            newChoice.className = 'choice-item';
-            newChoice.innerHTML = `
-                <input type="text" placeholder="Choice text" class="choice-text">
-                <input type="number" placeholder="Value" class="choice-value">
-                <button type="button" onclick="removeChoice(this)">Remove</button>
+            const choiceDiv = document.createElement('div');
+            choiceDiv.className = 'choice-item';
+            choiceDiv.innerHTML = `
+                <input type="text" class="form-control" placeholder="Choice text" required>
+                <input type="number" class="form-control" placeholder="Value" required>
+                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">
+                    <i class="fas fa-trash"></i>
+                </button>
             `;
-            container.appendChild(newChoice);
-        }
-
-        function removeChoice(button) {
-            button.parentElement.remove();
+            container.appendChild(choiceDiv);
+            
+            // Focus on the new choice text input
+            const newInput = choiceDiv.querySelector('input[type="text"]');
+            newInput.focus();
         }
 
         function addQuestion() {
             const container = document.getElementById('questionsContainer');
-            const newQuestion = document.createElement('div');
-            newQuestion.className = 'question-item';
-            newQuestion.innerHTML = `
-                <input type="text" placeholder="Enter question" class="question-text">
-                <button type="button" onclick="removeQuestion(this)">Remove</button>
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question-item';
+            questionDiv.innerHTML = `
+                <input type="text" class="form-control" placeholder="Question text" required>
+                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">
+                    <i class="fas fa-trash"></i>
+                </button>
             `;
-            container.appendChild(newQuestion);
+            container.appendChild(questionDiv);
+            
+            // Focus on the new question input
+            const newInput = questionDiv.querySelector('input');
+            newInput.focus();
         }
 
-        function removeQuestion(button) {
-            button.parentElement.remove();
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const successMessage = element.parentElement.querySelector('.success-message');
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2000);
+            });
         }
 
-        async function generateAssessment() {
+        function switchTab(tab) {
+            // Remove active class from all buttons and content
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Hide all copy buttons
+            document.getElementById('htmlCopyBtn').style.display = 'none';
+            document.getElementById('jsCopyBtn').style.display = 'none';
+
+            // Add active class to selected tab and content
+            if (tab === 'html') {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+                document.getElementById('htmlSection').classList.add('active');
+                document.getElementById('htmlCopyBtn').style.display = 'flex';
+            } else {
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                document.getElementById('jsSection').classList.add('active');
+                document.getElementById('jsCopyBtn').style.display = 'flex';
+            }
+        }
+
+        function resetForm() {
+            // Reset form inputs
+            document.getElementById('name').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('formAction').value = '';
+            
+            // Clear choices and questions
+            document.getElementById('choicesContainer').innerHTML = '';
+            document.getElementById('questionsContainer').innerHTML = '';
+            
+            // Hide output container
+            document.getElementById('outputContainer').style.display = 'none';
+            
+            // Add initial choice and question
+            addChoice();
+            addQuestion();
+            
+            // Focus on name input
+            document.getElementById('name').focus();
+        }
+
+        document.getElementById('generatorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const choices = Array.from(document.querySelectorAll('#choicesContainer .choice-item')).map(item => {
+                const [text, value] = item.querySelectorAll('input');
+                return [text.value, parseInt(value.value)];
+            });
+
+            const questions = Array.from(document.querySelectorAll('#questionsContainer .question-item input')).map(input => input.value);
+
+            const config = {
+                name: document.getElementById('name').value,
+                title: document.getElementById('title').value,
+                form_action_url: document.getElementById('formAction').value,
+                choices,
+                questions
+            };
+
             try {
-                // Validate required fields
-                const name = document.getElementById('name').value;
-                const title = document.getElementById('title').value;
-                const formUrl = document.getElementById('form_action_url').value;
-                
-                if (!name || !title || !formUrl) {
-                    throw new Error('Please fill in all required fields (Name, Title, and Form URL)');
-                }
-                
-                // Validate choices
-                const choices = Array.from(document.querySelectorAll('.choice-item')).map(item => {
-                    const text = item.querySelector('.choice-text').value;
-                    const value = item.querySelector('.choice-value').value;
-                    if (!text || value === '') {
-                        throw new Error('Please fill in all choice fields');
-                    }
-                    return [text, parseInt(value)];
-                });
-                
-                if (choices.length === 0) {
-                    throw new Error('Please add at least one choice');
-                }
-                
-                // Validate questions
-                const questions = Array.from(document.querySelectorAll('.question-text'))
-                    .map(q => q.value)
-                    .filter(q => q.trim());
-                
-                if (questions.length === 0) {
-                    throw new Error('Please add at least one question');
-                }
-                
-                const config = {
-                    name,
-                    title,
-                    form_action_url: formUrl,
-                    choices,
-                    questions
-                };
-
                 const response = await fetch('/generate', {
                     method: 'POST',
                     headers: {
@@ -157,38 +447,35 @@
                 });
 
                 const data = await response.json();
-                
+
                 if (data.success) {
-                    document.getElementById('htmlCode').textContent = data.html;
-                    document.getElementById('jsCode').textContent = data.js;
+                    document.getElementById('htmlOutput').textContent = data.html;
+                    document.getElementById('jsOutput').textContent = data.js;
+                    document.getElementById('outputContainer').style.display = 'block';
                 } else {
                     alert('Error: ' + data.error);
                 }
             } catch (error) {
-                alert('Error: ' + error.message);
+                alert('Error generating form: ' + error.message);
             }
-        }
+        });
 
-        function showTab(tabName) {
-            const tabs = ['html', 'js'];
-            tabs.forEach(tab => {
-                document.getElementById(tab + 'Output').style.display = 
-                    tab === tabName ? 'block' : 'none';
-                document.getElementById('copy' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Btn').style.display =
-                    tab === tabName ? 'inline-block' : 'none';
-            });
-        }
+        document.getElementById('generatorForm').addEventListener('reset', () => {
+            // Reset form fields
+            document.getElementById('name').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('formAction').value = '';
+            Array.from(document.querySelectorAll('#choicesContainer .choice-item')).forEach(item => item.remove());
+            Array.from(document.querySelectorAll('#questionsContainer .question-item')).forEach(item => item.remove());
+            document.getElementById('outputContainer').style.display = 'none';
+        });
 
-        function copyToClipboard(elementId) {
-            const element = document.getElementById(elementId);
-            const text = element.textContent;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Copied to clipboard!');
-            }).catch(err => {
-                alert('Failed to copy: ' + err);
-            });
-        }
+        // Add initial choice and question
+        addChoice();
+        addQuestion();
+
+        // Focus on Assessment Name input when page loads
+        document.getElementById('name').focus();
     </script>
 </body>
 </html> 
