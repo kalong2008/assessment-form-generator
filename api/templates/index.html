@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assessment Form Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Assessment Form Generator</h1>
+        
+        <div class="input-section">
+            <h2>Configure Your Assessment Form</h2>
+            <div class="config-form">
+                <div class="form-group">
+                    <label for="name">Assessment Name:</label>
+                    <input type="text" id="name" placeholder="e.g., love_language">
+                </div>
+                
+                <div class="form-group">
+                    <label for="title">Assessment Title:</label>
+                    <input type="text" id="title" placeholder="e.g., 愛的語言測試">
+                </div>
+                
+                <div class="form-group">
+                    <label for="form_action_url">Form Action URL:</label>
+                    <input type="text" id="form_action_url" placeholder="e.g., https://example.com/submit">
+                </div>
+                
+                <div class="form-group">
+                    <label>Choices:</label>
+                    <div id="choicesContainer">
+                        <div class="choice-item">
+                            <input type="text" placeholder="Choice text" class="choice-text">
+                            <input type="number" placeholder="Value" class="choice-value">
+                            <button type="button" onclick="removeChoice(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addChoice()">Add Choice</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Questions:</label>
+                    <div id="questionsContainer">
+                        <div class="question-item">
+                            <input type="text" placeholder="Enter question" class="question-text">
+                            <button type="button" onclick="removeQuestion(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addQuestion()">Add Question</button>
+                </div>
+            </div>
+            <button onclick="generateAssessment()">Generate</button>
+        </div>
+
+        <div class="output-section">
+            <div class="header-section">
+                <div class="tab-buttons">
+                    <button onclick="showTab('html')">HTML</button>
+                    <button onclick="showTab('js')">JavaScript</button>
+                </div>
+                <div class="copy-buttons">
+                    <button onclick="copyToClipboard('htmlCode')" id="copyHtmlBtn" style="display: inline-block">Copy HTML</button>
+                    <button onclick="copyToClipboard('jsCode')" id="copyJsBtn" style="display: none">Copy JavaScript</button>
+                </div>
+            </div>
+
+            <div id="htmlOutput" class="tab-content">
+                <pre><code id="htmlCode"></code></pre>
+            </div>
+
+            <div id="jsOutput" class="tab-content" style="display:none;">
+                <pre><code id="jsCode"></code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addChoice() {
+            const container = document.getElementById('choicesContainer');
+            const newChoice = document.createElement('div');
+            newChoice.className = 'choice-item';
+            newChoice.innerHTML = `
+                <input type="text" placeholder="Choice text" class="choice-text">
+                <input type="number" placeholder="Value" class="choice-value">
+                <button type="button" onclick="removeChoice(this)">Remove</button>
+            `;
+            container.appendChild(newChoice);
+        }
+
+        function removeChoice(button) {
+            button.parentElement.remove();
+        }
+
+        function addQuestion() {
+            const container = document.getElementById('questionsContainer');
+            const newQuestion = document.createElement('div');
+            newQuestion.className = 'question-item';
+            newQuestion.innerHTML = `
+                <input type="text" placeholder="Enter question" class="question-text">
+                <button type="button" onclick="removeQuestion(this)">Remove</button>
+            `;
+            container.appendChild(newQuestion);
+        }
+
+        function removeQuestion(button) {
+            button.parentElement.remove();
+        }
+
+        async function generateAssessment() {
+            try {
+                // Validate required fields
+                const name = document.getElementById('name').value;
+                const title = document.getElementById('title').value;
+                const formUrl = document.getElementById('form_action_url').value;
+                
+                if (!name || !title || !formUrl) {
+                    throw new Error('Please fill in all required fields (Name, Title, and Form URL)');
+                }
+                
+                // Validate choices
+                const choices = Array.from(document.querySelectorAll('.choice-item')).map(item => {
+                    const text = item.querySelector('.choice-text').value;
+                    const value = item.querySelector('.choice-value').value;
+                    if (!text || value === '') {
+                        throw new Error('Please fill in all choice fields');
+                    }
+                    return [text, parseInt(value)];
+                });
+                
+                if (choices.length === 0) {
+                    throw new Error('Please add at least one choice');
+                }
+                
+                // Validate questions
+                const questions = Array.from(document.querySelectorAll('.question-text'))
+                    .map(q => q.value)
+                    .filter(q => q.trim());
+                
+                if (questions.length === 0) {
+                    throw new Error('Please add at least one question');
+                }
+                
+                const config = {
+                    name,
+                    title,
+                    form_action_url: formUrl,
+                    choices,
+                    questions
+                };
+
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('htmlCode').textContent = data.html;
+                    document.getElementById('jsCode').textContent = data.js;
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function showTab(tabName) {
+            const tabs = ['html', 'js'];
+            tabs.forEach(tab => {
+                document.getElementById(tab + 'Output').style.display = 
+                    tab === tabName ? 'block' : 'none';
+                document.getElementById('copy' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Btn').style.display =
+                    tab === tabName ? 'inline-block' : 'none';
+            });
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy: ' + err);
+            });
+        }
+    </script>
+</body>
+</html> 
