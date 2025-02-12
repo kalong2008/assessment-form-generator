@@ -39,7 +39,33 @@ ASSESSMENT_CONFIG = {
 
     #"total_questions": len(questions) + 1,
     # Question Title
-    "title": "愛的語言問卷"
+    "title": "愛的語言問卷",
+
+    # Categories configuration with thresholds, descriptions and colors
+    "categories": [
+        {
+            "threshold": 10,  # scores <= this value fall into this category
+            "name": "初階",
+            "description": "您正處於學習階段...",
+            "color": "#D0D8E0"
+        },
+        {
+            "threshold": 20,  # scores <= this value fall into this category
+            "name": "中階",
+            "description": "您已具備基本能力...",
+            "color": "#A9DFBF"
+        },
+        {
+            "threshold": float('inf'),  # catches all remaining scores
+            "name": "高階",
+            "description": "您展現出優秀的能力...",
+            "color": "#FAD7A0"
+        }
+    ],
+    
+    # List of question numbers (1-based) where scores should be inverted
+    # Leave empty [] if no questions need to be inverted
+    "inverse_scores": [],  
 }
 
 
@@ -62,6 +88,7 @@ class AssessmentGenerator:
         self.choices = config["choices"]
         self.questions = config["questions"]
         self.title = config["title"]
+        self.categories = config["categories"]
         self.js_generator = CalculationJSGenerator(config)
 
     def generate_radio_input(self, question_number, choice_index, label, value):
@@ -508,9 +535,45 @@ class CalculationJSGenerator:
         self.number_question = len(self.questions) + 1
         self.max_item_score = max(choice[1] for choice in config["choices"])
         self.total_score = (self.number_question - 1) * self.max_item_score
+        self.categories = config["categories"]
+
+        # Convert 1-based indices to 0-based for JavaScript
+        # If inverse_scores is empty, no questions will be inverted
+        self.inverse_scores = [x - 1 for x in config.get("inverse_scores", [])]
 
     def generate_js(self):
         """Generate the calculation.js content"""
+        # Generate the category evaluation logic based on config
+        category_conditions = []
+        for category in self.categories:
+            condition = f"""if (question_sum <= {category['threshold']}) {{
+        category.textContent = "{category['name']}";
+        description.textContent = "{category['description']}";
+        color = "{category['color']}";"""
+            category_conditions.append(condition)
+        
+        category_logic = "    " + " } else ".join(category_conditions) + " }"
+
+        # If inverse_scores is empty, no scores will be inverted
+        js_content = f"""
+        // Define the scores that need to be subtracted from {self.max_item_score} (0-based indices)
+        const inverseScores = {self.inverse_scores};  // Empty array means no scores will be inverted
+        const reverseScore = {self.max_item_score};
+        // Initial sum
+        var question_sum = 0;
+        // Iterate over the score keys
+        for (var i = 0; i <= (number_question - 2); i++) {{
+          var itemScore = parseInt(
+            document.querySelector(`input[name="${{name_question}}_${{i}}"]:checked`).value);
+          // Check if the score should be subtracted from reverseScore
+          if (inverseScores.includes(i)) {{
+            question_sum += reverseScore - itemScore;
+          }} else {{
+            question_sum += itemScore;
+          }}
+        }}
+        """
+
         return f"""
 var number_question = {self.number_question};
 var name_question = "{self.name}";
@@ -767,21 +830,7 @@ var form = document.getElementById(`form_${{name_question}}`);
 form.addEventListener("submit", function (e) {{
     e.preventDefault();
 
-    // Define the scores that need to be subtracted from 4
-    const inverseScores = [2, 5];
-    // Initial sum
-    var question_sum = 0;
-    // Iterate over the score keys
-    for (var i = 0; i <= (number_question - 2); i++) {{
-      var itemScore = parseInt(
-        document.querySelector(`input[name="${{name_question}}_${{i}}"]:checked`).value);
-      // Check if the score should be subtracted from 4
-      if (inverseScores.includes(i)) {{
-        question_sum += 4 - itemScore;
-      }} else {{
-        question_sum += itemScore;
-      }}
-    }}
+    {js_content}
 
     if (document.getElementById("user_name_manual").value != "") {{
         participantName.textContent = document.getElementById("user_name_manual").value;
@@ -790,19 +839,7 @@ form.addEventListener("submit", function (e) {{
     var category = document.getElementById(`${{name_question}}Category`);
     var description = document.getElementById(`${{name_question}}Description`);
 
-    if (question_sum <= total_score * 0.3) {{
-        category.textContent = "初階";
-        description.textContent = "您正處於學習階段...";
-        color = "#D0D8E0";
-    }} else if (question_sum <= total_score * 0.7) {{
-        category.textContent = "中階";
-        description.textContent = "您已具備基本能力...";
-        color = "#A9DFBF";
-    }} else {{
-        category.textContent = "高階";
-        description.textContent = "您展現出優秀的能力...";
-        color = "#FAD7A0";
-    }}
+    {category_logic}
 
     document.getElementById(`${{name_question}}QuestionDiv`).style.display = "none";
     document.getElementById(`${{name_question}}ResultDiv`).style.display = "";
