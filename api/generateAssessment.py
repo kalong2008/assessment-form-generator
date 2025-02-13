@@ -14,26 +14,26 @@ ASSESSMENT_CONFIG = {
     
     # List of questions for the assessment
     "questions": [
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
-        "下面兩個描述，哪一個對你來說更有意義？",
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False), 
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
+        ("下面兩個描述，哪一個對你來說更有意義？", False),
         # Add more questions here...
     ],
 
@@ -65,7 +65,7 @@ ASSESSMENT_CONFIG = {
     
     # List of question numbers (1-based) where scores should be inverted
     # Leave empty [] if no questions need to be inverted
-    "inverse_scores": [],  
+    #"inverse_scores": [],  
 }
 
 
@@ -86,7 +86,7 @@ class AssessmentGenerator:
         self.name = config["name"]
         self.form_action_url = config["form_action_url"]
         self.choices = config["choices"]
-        self.questions = config["questions"]
+        self.questions = [question[0] for question in config["questions"]]
         self.title = config["title"]
         self.categories = config["categories"]
         self.js_generator = CalculationJSGenerator(config)
@@ -530,7 +530,7 @@ class CalculationJSGenerator:
             config (dict): Configuration dictionary containing assessment parameters
         """
         self.name = config["name"]
-        self.questions = config["questions"]
+        self.questions = [question[0] for question in config["questions"]]
         self.title = config["title"]
         self.number_question = len(self.questions) + 1
         self.max_item_score = max(choice[1] for choice in config["choices"])
@@ -539,7 +539,7 @@ class CalculationJSGenerator:
 
         # Convert 1-based indices to 0-based for JavaScript
         # If inverse_scores is empty, no questions will be inverted
-        self.inverse_scores = [x - 1 for x in config.get("inverse_scores", [])]
+        self.inverse_scores = [i for i, choice in enumerate(config["questions"]) if choice[1]]
 
     def generate_js(self):
         """Generate the calculation.js content"""

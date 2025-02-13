@@ -87,15 +87,77 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .choices-container, .questions-container {
+        .choices-container,
+        .questions-container {
             margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .choice-item, .question-item {
+        .choice-item,
+        .question-item {
+            background-color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: -0.75rem;
+            right: -0.75rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            min-width: unset;
+            line-height: 1;
+            transition: all 0.2s ease;
+            background-color: var(--danger);
+            border: 2px solid white;
+            color: white;
+            overflow: hidden;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.1);
+            background-color: #dc2626;
+        }
+
+        .delete-btn i {
+            font-size: 0.75rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .choice-delete-btn,
+        .question-delete-btn {
+            /* These classes will inherit from .delete-btn */
+        }
+
+        .choice-inputs {
             display: flex;
             gap: 1rem;
-            margin-bottom: 1rem;
             align-items: center;
+        }
+
+        .choice-text-input {
+            flex: 2;
+        }
+
+        .choice-value-input {
+            flex: 1;
         }
 
         .btn {
@@ -120,6 +182,8 @@
         .btn-danger {
             background-color: var(--danger);
             color: white;
+            padding: 0.75rem;
+            border-radius: 2rem;
         }
 
         .btn-secondary {
@@ -284,13 +348,26 @@
         /* Category styles */
         .categories-container {
             margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Add styles for the add button container */
+        .add-button-container {
+            margin-top: 1rem;
         }
 
         .category-item {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            align-items: center;
+            background-color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .category-delete-btn {
+            /* These classes will inherit from .delete-btn */
         }
 
         /* Checkbox styles */
@@ -330,60 +407,127 @@
         }
 
         .category-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr 2fr auto;
+            display: flex;
+            flex-direction: column;
             gap: 1rem;
             flex: 1;
         }
 
-        .color-input {
-            width: 60px;
-            padding: 0.25rem;
-            height: 42px;
+        .category-input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
 
-        .category-item {
-            background-color: #f8fafc;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #e2e8f0;
+        .category-input-row.description {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
         }
 
-        .inverse-scores {
-            margin-bottom: 1rem;
+        .description-input {
+            flex: 1;
         }
 
-        .inverse-scores input {
-            margin-top: 0.5rem;
-        }
-
-        .inverse-scores .hint {
-            display: inline-block;
-        }
-
-        .threshold-input {
-            position: relative;
+        .color-row {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            min-width: fit-content;
+        }
+
+        .color-input {
+            width: 42px;
+            min-height: 42px;
+            padding: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .threshold-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .threshold-input input {
+            flex: 1;
         }
 
         .infinity-toggle {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.5rem;
             white-space: nowrap;
+            min-width: fit-content;
+            height: 42px; /* Match input height */
+            padding: 0 0.5rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
         }
 
         .infinity-checkbox {
-            width: 1rem;
-            height: 1rem;
+            width: 1.2rem;
+            height: 1.2rem;
             cursor: pointer;
+            margin: 0;
+        }
+
+        .infinity-toggle .hint {
+            margin: 0;
         }
 
         input:disabled {
             background-color: #f1f5f9;
             cursor: not-allowed;
+        }
+
+        .question-inputs {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .question-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            height: 42px; /* Match input height */
+            padding: 0 0.5rem;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+
+        .question-checkbox {
+            width: 1.2rem;
+            height: 1.2rem;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .question-toggle .hint {
+            margin: 0;
+        }
+
+        /* Update media queries */
+        @media (max-width: 1024px) {
+            /* Remove the grid-template-columns rule */
+        }
+
+        @media (max-width: 768px) {
+            .category-input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .threshold-input {
+                flex-direction: row;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -419,35 +563,31 @@
                 <div class="form-group">
                     <label>Score Categories <span class="hint">(define score ranges and their corresponding categories)</span></label>
                     <div id="categoriesContainer" class="categories-container"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addCategory()">
-                        <i class="fas fa-plus"></i> Add Category
-                    </button>
-                </div>
-
-                <div class="form-group">
-                    <div class="inverse-scores">
-                        <label>Inverse Scores <span class="hint">(optional - question numbers to reverse score, e.g., 1,3)</span></label>
-                        <input type="text" id="inverseScores" class="form-control" 
-                               placeholder="e.g., 1,3,5"
-                               pattern="^[0-9]+(,[0-9]+)*$"
-                               title="Enter comma-separated numbers">
+                    <div class="add-button-container">
+                        <button type="button" class="btn btn-secondary" onclick="addCategory()">
+                            <i class="fas fa-plus"></i> Add Category
+                        </button>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>Answer Choices</label>
                     <div id="choicesContainer" class="choices-container"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addChoice()">
-                        <i class="fas fa-plus"></i> Add Choice
-                    </button>
+                    <div class="add-button-container">
+                        <button type="button" class="btn btn-secondary" onclick="addChoice()">
+                            <i class="fas fa-plus"></i> Add Choice
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Questions</label>
                     <div id="questionsContainer" class="questions-container"></div>
-                    <button type="button" class="btn btn-secondary" onclick="addQuestion()">
-                        <i class="fas fa-plus"></i> Add Question
-                    </button>
+                    <div class="add-button-container">
+                        <button type="button" class="btn btn-secondary" onclick="addQuestion()">
+                            <i class="fas fa-plus"></i> Add Question
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-buttons">
@@ -497,16 +637,18 @@
             const choiceDiv = document.createElement('div');
             choiceDiv.className = 'choice-item';
             choiceDiv.innerHTML = `
-                <input type="text" class="form-control" placeholder="Choice text" required>
-                <input type="number" class="form-control" placeholder="Value" required>
-                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">
-                    <i class="fas fa-trash"></i>
+                <div class="choice-inputs">
+                    <input type="text" class="form-control choice-text-input" placeholder="Choice text" required>
+                    <input type="number" class="form-control choice-value-input" placeholder="Value" required>
+                </div>
+                <button type="button" class="btn btn-danger delete-btn" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
                 </button>
             `;
             container.appendChild(choiceDiv);
             
             // Focus on the new choice text input
-            const newInput = choiceDiv.querySelector('input[type="text"]');
+            const newInput = choiceDiv.querySelector('.choice-text-input');
             newInput.focus();
         }
 
@@ -515,15 +657,21 @@
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-item';
             questionDiv.innerHTML = `
-                <input type="text" class="form-control" placeholder="Question text" required>
-                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">
-                    <i class="fas fa-trash"></i>
+                <div class="question-inputs">
+                    <input type="text" class="form-control" placeholder="Question text" required>
+                    <div class="question-toggle">
+                        <input type="checkbox" class="question-checkbox">
+                        <span class="hint">Reverse item</span>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger delete-btn" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
                 </button>
             `;
             container.appendChild(questionDiv);
             
             // Focus on the new question input
-            const newInput = questionDiv.querySelector('input');
+            const newInput = questionDiv.querySelector('input[type="text"]');
             newInput.focus();
         }
 
@@ -533,29 +681,36 @@
             categoryDiv.className = 'category-item';
             categoryDiv.innerHTML = `
                 <div class="category-inputs">
-                    <input type="text" class="form-control" 
-                           placeholder="Category name (e.g., Beginner)" 
-                           data-field="name" required>
-                    <div class="threshold-input">
-                        <input type="number" class="form-control" 
-                               placeholder="Max score for this category" 
-                               data-field="threshold" required>
-                        <div class="infinity-toggle">
-                            <input type="checkbox" class="infinity-checkbox" onchange="toggleInfinity(this)">
-                            <span class="hint" title="Check for highest category">∞</span>
+                    <div class="category-input-row">
+                        <input type="text" class="form-control" 
+                               placeholder="Category name (e.g., Beginner)" 
+                               data-field="name" required>
+                        <div class="threshold-input">
+                            <input type="number" class="form-control" 
+                                   placeholder="Max score for this category" 
+                                   data-field="threshold" required>
+                            <div class="infinity-toggle">
+                                <input type="checkbox" class="infinity-checkbox" onchange="toggleInfinity(this)">
+                                <span class="hint" title="Check for highest category">Last category</span>
+                            </div>
                         </div>
                     </div>
-                    <input type="text" class="form-control" 
-                           placeholder="Category description (e.g., Basic understanding...)" 
-                           data-field="description" required>
-                    <input type="color" class="form-control color-input" 
-                           value="#e2e8f0" 
-                           data-field="color" 
-                           title="Category color" 
-                           required>
+                    <div class="category-input-row description">
+                        <input type="text" class="form-control description-input" 
+                               placeholder="Category description (e.g., Basic understanding...)" 
+                               data-field="description" required>
+                        <div class="color-row">
+                            <input type="color" class="form-control color-input" 
+                                   value="#e2e8f0" 
+                                   data-field="color" 
+                                   title="Category color" 
+                                   required>
+                            <span class="hint">Color</span>
+                        </div>
+                    </div>
                 </div>
-                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">
-                    <i class="fas fa-trash"></i>
+                <button type="button" class="btn btn-danger delete-btn" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
                 </button>
             `;
             container.appendChild(categoryDiv);
@@ -614,9 +769,6 @@
             // Clear categories
             document.getElementById('categoriesContainer').innerHTML = '';
             
-            // Reset scoring configuration
-            document.getElementById('inverseScores').value = '';
-            
             // Hide output container
             document.getElementById('outputContainer').style.display = 'none';
             
@@ -644,7 +796,7 @@
             e.preventDefault();
             
             // Add required attributes and validate
-            const requiredInputs = document.querySelectorAll('.form-control:not(#inverseScores)');
+            const requiredInputs = document.querySelectorAll('.form-control');
             requiredInputs.forEach(input => {
                 input.setAttribute('required', '');
             });
@@ -665,12 +817,18 @@
                 return;
             }
 
-            const choices = Array.from(document.querySelectorAll('#choicesContainer .choice-item')).map(item => {
-                const [text, value] = item.querySelectorAll('input');
-                return [text.value, parseInt(value.value)];
-            });
+            const choices = Array.from(document.querySelectorAll('#choicesContainer .choice-item'))
+                .map(item => {
+                    const [text, value] = item.querySelectorAll('input');
+                    return [text.value, parseInt(value.value)];
+                });
 
-            const questions = Array.from(document.querySelectorAll('#questionsContainer .question-item input')).map(input => input.value);
+            const questions = Array.from(document.querySelectorAll('#questionsContainer .question-item'))
+                .map(item => {
+                    const textInput = item.querySelector('input[type="text"]');
+                    const checkbox = item.querySelector('.question-checkbox');
+                    return [textInput.value, checkbox.checked];
+                });
 
             const categories = Array.from(document.querySelectorAll('#categoriesContainer .category-item'))
                 .map(item => {
@@ -695,18 +853,13 @@
                 categories[categories.length - 1].threshold = Infinity;
             }
 
-            const inverseScoresStr = document.getElementById('inverseScores').value.trim();
-            const inverseScores = inverseScoresStr ? 
-                inverseScoresStr.split(',').map(num => parseInt(num)) : [];
-
             const config = {
                 name: document.getElementById('name').value,
                 title: document.getElementById('title').value,
                 form_action_url: document.getElementById('formAction').value,
                 choices,
                 questions,
-                categories,
-                inverse_scores: inverseScores
+                categories
             };
 
             try {
