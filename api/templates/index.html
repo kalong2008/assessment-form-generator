@@ -783,7 +783,7 @@
         function toggleInfinity(checkbox) {
             const thresholdInput = checkbox.closest('.threshold-input').querySelector('[data-field="threshold"]');
             if (checkbox.checked) {
-                thresholdInput.value = 'Infinity';
+                thresholdInput.value = 1000;
                 thresholdInput.disabled = true;
             } else {
                 thresholdInput.value = '';
@@ -850,7 +850,7 @@
 
             // Add infinity threshold to last category
             if (categories.length > 0) {
-                categories[categories.length - 1].threshold = Infinity;
+                categories[categories.length - 1].threshold = choices.length * Math.max(...choices.map(choice => choice[1]));
             }
 
             const config = {

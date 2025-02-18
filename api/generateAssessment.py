@@ -580,6 +580,7 @@ var name_question = "{self.name}";
 var max_item_score = {self.max_item_score}
 var total_score = {self.total_score};
 var scale_name = "{self.title}";
+var scale_name_plot = scale_name.replace('問卷','').replace('量表', '').replace('測試', '').replace('測驗', '');
 
 document.querySelector("#start_div").addEventListener("click", function () {{
     document.querySelector(`#${{name_question}}IntroDiv`).style.display = "none";
@@ -848,7 +849,7 @@ form.addEventListener("submit", function (e) {{
     var data = [{{
         domain: {{ x: [0, 1], y: [0, 1] }},
         value: question_sum,
-        title: {{ text: scale_name }},
+        title: {{ text: scale_name_plot }},
         type: "indicator",
         mode: "gauge+number",
         gauge: {{
