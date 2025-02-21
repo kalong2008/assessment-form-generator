@@ -850,7 +850,7 @@
 
             // Add infinity threshold to last category
             if (categories.length > 0) {
-                categories[categories.length - 1].threshold = choices.length * Math.max(...choices.map(choice => choice[1]));
+                categories[categories.length - 1].threshold = questions.length * Math.max(...choices.map(choice => choice[1]));
             }
 
             const config = {
